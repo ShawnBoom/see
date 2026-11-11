@@ -65,9 +65,9 @@ test("loads one requested binary LUT, coalesces in-flight work, and reuses decod
 test("the lightweight image engine and loader have no LUT payload dependency graph", async () => {
   const files = await Promise.all([
     readFile(new URL("../lib/image-engine.js", import.meta.url), "utf8"),
-    readFile(new URL("../docs/image-engine.js", import.meta.url), "utf8"),
+    readFile(new URL("../docs/image-engine-v60.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/lut-loader.js", import.meta.url), "utf8"),
-    readFile(new URL("../docs/lut-loader.js", import.meta.url), "utf8"),
+    readFile(new URL("../docs/lut-loader-v60.js", import.meta.url), "utf8"),
   ]);
   for (const engine of files.slice(0, 2)) {
     assert.doesNotMatch(engine, /from "\.\/s(?:0[1-9]|1[0-4])-[^"]+-lut\.js/);

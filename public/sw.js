@@ -2,8 +2,8 @@
 
 importScripts("/lut-pack-sw.js?v=1");
 
-const CORE_CACHE = "see-core-v59";
-const RUNTIME_CACHE = "see-runtime-v59";
+const CORE_CACHE = "see-core-v60";
+const RUNTIME_CACHE = "see-runtime-v60";
 const ROOT = new URL("/", self.registration.scope).href;
 const LUT_MANIFEST_URL = new URL("/lut-pack-v1.json", ROOT).href;
 const APP_SHELL = [

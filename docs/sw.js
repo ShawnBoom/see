@@ -2,25 +2,27 @@
 
 importScripts("./lut-pack-sw.js?v=1");
 
-const CORE_CACHE = "see-core-v59";
+const CORE_CACHE = "see-core-v60";
+const PREVIOUS_CORE_CACHE = "see-core-v59";
+const RELEASE_SCRIPT = "./app-v60.js";
 const ROOT = new URL("./", self.registration.scope).href;
 const LUT_MANIFEST_URL = new URL("./lut-pack-v1.json", ROOT).href;
 const CORE_APP_SHELL = [
   ROOT,
   new URL("./index.html", ROOT).href,
-  new URL("./styles.css?v=59", ROOT).href,
-  new URL("./app.js?v=59", ROOT).href,
-  new URL("./gpu-preview.js?v=59", ROOT).href,
-  new URL("./gpu-export.js?v=59", ROOT).href,
-  new URL("./export-processor.js?v=59", ROOT).href,
-  new URL("./export-worker.js?v=59", ROOT).href,
-  new URL("./edit-state.js?v=59", ROOT).href,
-  new URL("./image-engine.js?v=59", ROOT).href,
-  new URL("./lut-loader.js?v=59", ROOT).href,
+  new URL("./styles.css?v=60", ROOT).href,
+  new URL("./app-v60.js", ROOT).href,
+  new URL("./gpu-preview-v60.js", ROOT).href,
+  new URL("./gpu-export-v60.js", ROOT).href,
+  new URL("./export-processor-v60.js", ROOT).href,
+  new URL("./export-worker-v60.js", ROOT).href,
+  new URL("./edit-state-v60.js", ROOT).href,
+  new URL("./image-engine-v60.js", ROOT).href,
+  new URL("./lut-loader-v60.js", ROOT).href,
   new URL("./lut-pack-sw.js?v=1", ROOT).href,
   LUT_MANIFEST_URL,
-  new URL("./manifest.webmanifest?v=59", ROOT).href,
-  new URL("./apple-touch-icon.png?v=59", ROOT).href,
+  new URL("./manifest.webmanifest?v=60", ROOT).href,
+  new URL("./apple-touch-icon.png?v=60", ROOT).href,
   new URL("./icons/see-apple-touch-icon-120.png", ROOT).href,
   new URL("./icons/see-apple-touch-icon-152.png", ROOT).href,
   new URL("./icons/see-apple-touch-icon-167.png", ROOT).href,
@@ -45,7 +47,15 @@ async function fetchAndCache(request, cacheName, cacheKey = request) {
 
 self.addEventListener("install", (event) => {
   event.waitUntil(Promise.all([
-    caches.open(CORE_CACHE).then((cache) => cache.addAll(CORE_APP_SHELL)),
+    (async () => {
+      const cache = await caches.open(CORE_CACHE);
+      await cache.addAll(CORE_APP_SHELL.map((url) => new Request(url, { cache: "reload" })));
+      const shell = await cache.match(ROOT);
+      if (!shell || !(await shell.text()).includes(RELEASE_SCRIPT)) {
+        await caches.delete(CORE_CACHE);
+        throw new Error("See. v60 shell has not propagated yet");
+      }
+    })(),
     self.skipWaiting(),
   ]));
 });
@@ -54,7 +64,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(keys
-      .filter((key) => key !== CORE_CACHE && !self.SeeLutPackSW.protectedCacheNames.has(key))
+      .filter((key) => key !== CORE_CACHE && key !== PREVIOUS_CORE_CACHE && !self.SeeLutPackSW.protectedCacheNames.has(key))
       .map((key) => caches.delete(key)));
     await self.clients.claim();
   })());
@@ -77,8 +87,10 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") {
     const coreCachePromise = caches.open(CORE_CACHE);
-    const networkUpdate = coreCachePromise.then((cache) => fetch(request).then((response) => {
-      if (response.ok) return cache.put(ROOT, response.clone()).then(() => response);
+    const networkUpdate = coreCachePromise.then((cache) => fetch(request).then(async (response) => {
+      if (response.ok && (await response.clone().text()).includes(RELEASE_SCRIPT)) {
+        return cache.put(ROOT, response.clone()).then(() => response);
+      }
       return response;
     }));
     event.waitUntil(networkUpdate.then(() => undefined).catch(() => undefined));
@@ -99,10 +111,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (["script", "style", "image", "font", "manifest"].includes(request.destination)
+  if (["script", "worker", "style", "image", "font", "manifest"].includes(request.destination)
       || url.href === LUT_MANIFEST_URL) {
     event.respondWith(caches.open(CORE_CACHE).then(async (cache) => (
       await cache.match(request, { ignoreSearch: false })
+      || (url.searchParams.get("v") === "59" && await (await caches.open(PREVIOUS_CORE_CACHE)).match(request))
       || fetchAndCache(request, CORE_CACHE)
     )));
   }
