@@ -8,7 +8,7 @@ export function PwaRegister() {
     if ("serviceWorker" in navigator) {
       window.requestAnimationFrame(() => window.setTimeout(async () => {
         try {
-          const registration = await navigator.serviceWorker.register("/sw.js?v=60");
+          const registration = await navigator.serviceWorker.register("/sw.js?v=61");
           const probe = (window as typeof window & {
             __SEE_BOOT__?: { events: Array<{ label: string; time: number; detail: string }> };
           }).__SEE_BOOT__;

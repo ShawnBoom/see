@@ -67,7 +67,7 @@ test("keeps photo processing local, independent per photo, and batch-capable", a
   const [page, engine, staticApp, layout, packageJson] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../lib/image-engine.js", import.meta.url), "utf8"),
-    readFile(new URL("../docs/app-v60.js", import.meta.url), "utf8"),
+    readFile(new URL("../docs/app-v61.js", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
@@ -254,12 +254,13 @@ test("uses the requested filter labels and interface colors", async () => {
     assert.match(styles, /\.filter-label\s*\{[^}]*flex-direction:\s*column[^}]*align-items:\s*center[^}]*justify-content:\s*center[^}]*text-align:\s*center/s);
     assert.match(styles, /background:\s*var\(--privacy-dot\)/);
     assert.match(styles, /\.filter-button\.is-active\s*\{[^}]*color:\s*var\(--privacy-dot\)[^}]*font-style:\s*italic/s);
-    assert.match(styles, /\.filter-row\s*\{[^}]*grid-template-columns:\s*repeat\(7, minmax\(0, 1fr\)\)[^}]*grid-template-rows:\s*repeat\(2, minmax\(0, 1fr\)\)[^}]*flex:\s*0 0 68px[^}]*min-height:\s*68px/s);
+    assert.match(styles, /\.filter-row\s*\{[^}]*grid-template-columns:\s*repeat\(7, minmax\(max-content, 1fr\)\)[^}]*grid-template-rows:\s*repeat\(2, minmax\(0, 1fr\)\)[^}]*flex:\s*0 0 68px[^}]*min-height:\s*68px/s);
     assert.doesNotMatch(styles, /\.filter-button\s*\{[^}]*border-right/s);
     assert.doesNotMatch(styles, /\.filter-button:nth-child\(7n\)/);
-    assert.match(styles, /\.filter-button:nth-child\(-n \+ 7\)\s*\{[^}]*border-bottom:\s*0\.5px solid rgba\(243, 232, 204, 0\.08\)/s);
-    assert.match(styles, /\.adjustment-tab\.is-active\s*\{[^}]*background:\s*var\(--accent\)[^}]*color:\s*var\(--privacy-dot\)/s);
-    assert.match(styles, /\.adjustment-tab\s*\{[^}]*width:\s*70px[^}]*min-height:\s*26px[^}]*justify-self:\s*center[^}]*color:\s*rgba\(243, 232, 204, 0\.5\)[^}]*font-size:\s*12px/s);
+    assert.match(styles, /\.filter-button::before\s*\{[^}]*inset:\s*1px[^}]*border-radius:\s*5px[^}]*background:\s*var\(--panel\)[^}]*pointer-events:\s*none/s);
+    assert.match(styles, /\.adjustment-tab\.is-active\s*\{[^}]*color:\s*var\(--privacy-dot\)/s);
+    assert.match(styles, /\.adjustment-tab\.is-active::before\s*\{[^}]*height:\s*29px[^}]*background:\s*var\(--accent\)[^}]*pointer-events:\s*none/s);
+    assert.match(styles, /\.adjustment-tab\s*\{[^}]*width:\s*70px[^}]*min-height:\s*32px[^}]*justify-self:\s*center[^}]*color:\s*rgba\(243, 232, 204, 0\.5\)[^}]*font-size:\s*12px/s);
     assert.match(styles, /\.bottom-action\s*\{[^}]*width:\s*fit-content[^}]*padding:\s*0 8px[^}]*justify-self:\s*center[^}]*border-radius:\s*999px[^}]*background:\s*transparent[^}]*color:\s*rgba\(243, 232, 204, 0\.5\)/s);
     assert.match(styles, /\.bottom-action\s*\{[^}]*font-size:\s*12px/s);
     assert.match(styles, /\.save-action\s*\{[^}]*background:\s*transparent[^}]*color:\s*rgba\(243, 232, 204, 0\.5\)/s);
@@ -270,10 +271,10 @@ test("uses the requested filter labels and interface colors", async () => {
     assert.match(styles, /\.compare-button\s*\{[^}]*color:\s*var\(--control-surface\)/s);
     assert.match(styles, /\.thumbnail\.add-photo\s*\{[^}]*color:\s*var\(--control-surface\)/s);
     assert.match(styles, /\.value-input\s*\{[^}]*color:\s*var\(--control-surface\)[^}]*font-size:\s*15px/s);
-    assert.match(styles, /\.adjustment-panel\s*\{[^}]*flex:\s*0 0 74px[^}]*min-height:\s*74px/s);
+    assert.match(styles, /\.adjustment-panel\s*\{[^}]*flex:\s*0 0 80px[^}]*min-height:\s*80px/s);
     assert.match(styles, /\.slider-row\s*\{[^}]*min-height:\s*40px[^}]*padding-top:\s*0/s);
     assert.match(styles, /\.range-control\s*\{[^}]*height:\s*40px[^}]*touch-action:\s*none/s);
-    assert.match(styles, /\.range-control::-webkit-slider-runnable-track\s*\{[^}]*height:\s*3px/s);
+    assert.match(styles, /\.range-control::-webkit-slider-runnable-track\s*\{[^}]*height:\s*5px/s);
     assert.match(styles, /\.range-control::-webkit-slider-thumb\s*\{[^}]*width:\s*15px[^}]*height:\s*15px/s);
     assert.match(styles, /\.photo-count\s*\{[^}]*background:\s*transparent[^}]*color:\s*var\(--privacy-dot\)/s);
     assert.match(styles, /\.bottom-action:active:not\(:disabled\)\s*\{[^}]*padding-right:\s*5px[^}]*padding-left:\s*5px[^}]*border-color:\s*var\(--privacy-dot\)[^}]*background:\s*var\(--privacy-dot\)[^}]*color:\s*var\(--accent\)/s);
@@ -295,18 +296,18 @@ test("ships cache-busted, relative GitHub Pages assets", async () => {
   const [staticHtml, staticWorker, staticApp, staticEngine, staticLoader, staticPackWorker, appWorker] = await Promise.all([
     readFile(new URL("../docs/index.html", import.meta.url), "utf8"),
     readFile(new URL("../docs/sw.js", import.meta.url), "utf8"),
-    readFile(new URL("../docs/app-v60.js", import.meta.url), "utf8"),
+    readFile(new URL("../docs/app-v61.js", import.meta.url), "utf8"),
     readFile(new URL("../docs/image-engine-v60.js", import.meta.url), "utf8"),
     readFile(new URL("../docs/lut-loader-v60.js", import.meta.url), "utf8"),
     readFile(new URL("../docs/lut-pack-sw.js", import.meta.url), "utf8"),
     readFile(new URL("../public/sw.js", import.meta.url), "utf8"),
   ]);
 
-  assert.match(staticHtml, /type="module" src="\.\/app-v60\.js"/);
-  assert.match(staticHtml, /href="\.\/styles\.css\?v=60"/);
+  assert.match(staticHtml, /type="module" src="\.\/app-v61\.js"/);
+  assert.match(staticHtml, /href="\.\/styles\.css\?v=61"/);
   assert.match(staticApp, /from "\.\/image-engine-v60\.js"/);
   assert.match(staticApp, /from "\.\/lut-loader-v60\.js"/);
-  assert.match(staticWorker, /see-core-v60/);
+  assert.match(staticWorker, /see-core-v61/);
   assert.match(staticPackWorker, /see-luts-v52/);
   assert.match(staticPackWorker, /see-luts-bin-v/);
   assert.match(staticWorker, /gpu-preview-v60\.js/);
@@ -331,15 +332,15 @@ test("ships cache-busted, relative GitHub Pages assets", async () => {
   assert.match(staticPackWorker, /preparationPromise/);
   assert.match(staticPackWorker, /Math\.min\(2, missing\.length\)/);
   assert.match(staticWorker, /see-welcome\.png/);
-  assert.match(appWorker, /see-core-v60/);
-  assert.match(appWorker, /see-runtime-v60/);
+  assert.match(appWorker, /see-core-v61/);
+  assert.match(appWorker, /see-runtime-v61/);
   assert.match(appWorker, /see-welcome\.png/);
 });
 
 test("uses independent GPU preview and GPU-primary full-resolution export with CPU fallback", async () => {
   const [page, staticApp, gpuPreview, engine, exportWorker] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../docs/app-v60.js", import.meta.url), "utf8"),
+    readFile(new URL("../docs/app-v61.js", import.meta.url), "utf8"),
     readFile(new URL("../docs/gpu-preview-v60.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/image-engine.js", import.meta.url), "utf8"),
     readFile(new URL("../docs/export-worker-v60.js", import.meta.url), "utf8"),
@@ -378,7 +379,7 @@ test("shows actual preview and production export diagnostics only for debug quer
   const [page, staticHtml, staticApp, gpuPreview, sourceGpuPreview, productionExport, staticStyles] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../docs/index.html", import.meta.url), "utf8"),
-    readFile(new URL("../docs/app-v60.js", import.meta.url), "utf8"),
+    readFile(new URL("../docs/app-v61.js", import.meta.url), "utf8"),
     readFile(new URL("../docs/gpu-preview-v60.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/gpu-preview.js", import.meta.url), "utf8"),
     readFile(new URL("../docs/gpu-export-v60.js", import.meta.url), "utf8"),
@@ -402,7 +403,7 @@ test("shows actual preview and production export diagnostics only for debug quer
   assert.match(staticApp, /GPU full-resolution/);
   assert.match(staticApp, /Worker fallback/);
   assert.match(staticApp, /GPU fallback:/);
-  assert.match(staticApp, /Build: v60/);
+  assert.match(staticApp, /Build: v61/);
   assert.match(staticApp, /Processing: OpenLight Light \/ LightCraft Color \/ glsl-film-grain/);
   assert.match(staticApp, /Grain footprint:/);
   assert.match(staticApp, /Grain resources:/);
@@ -448,7 +449,7 @@ test("shows actual preview and production export diagnostics only for debug quer
 test("paints Saving feedback before sequential GPU-primary export and preserves Worker/share fallbacks", async () => {
   const [page, staticApp, processor, worker] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../docs/app-v60.js", import.meta.url), "utf8"),
+    readFile(new URL("../docs/app-v61.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/export-processor.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/export-worker.js", import.meta.url), "utf8"),
   ]);
@@ -497,7 +498,7 @@ test("preserves CPU fallback when WebGL2 initialization is forced to fail", asyn
     else globalThis.document = originalDocument;
   }
 
-  const staticApp = await readFile(new URL("../docs/app-v60.js", import.meta.url), "utf8");
+  const staticApp = await readFile(new URL("../docs/app-v61.js", import.meta.url), "utf8");
   assert.match(staticApp, /if \(gpuPreview\)/);
   assert.match(staticApp, /processPixels\(state\.sourceData, photo\.edit, photo\.grainSeed\)/);
 });

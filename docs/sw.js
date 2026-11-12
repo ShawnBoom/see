@@ -2,16 +2,16 @@
 
 importScripts("./lut-pack-sw.js?v=1");
 
-const CORE_CACHE = "see-core-v60";
-const PREVIOUS_CORE_CACHE = "see-core-v59";
-const RELEASE_SCRIPT = "./app-v60.js";
+const CORE_CACHE = "see-core-v61";
+const PREVIOUS_CORE_CACHE = "see-core-v60";
+const RELEASE_SCRIPT = "./app-v61.js";
 const ROOT = new URL("./", self.registration.scope).href;
 const LUT_MANIFEST_URL = new URL("./lut-pack-v1.json", ROOT).href;
 const CORE_APP_SHELL = [
   ROOT,
   new URL("./index.html", ROOT).href,
-  new URL("./styles.css?v=60", ROOT).href,
-  new URL("./app-v60.js", ROOT).href,
+  new URL("./styles.css?v=61", ROOT).href,
+  new URL("./app-v61.js", ROOT).href,
   new URL("./gpu-preview-v60.js", ROOT).href,
   new URL("./gpu-export-v60.js", ROOT).href,
   new URL("./export-processor-v60.js", ROOT).href,
@@ -53,7 +53,7 @@ self.addEventListener("install", (event) => {
       const shell = await cache.match(ROOT);
       if (!shell || !(await shell.text()).includes(RELEASE_SCRIPT)) {
         await caches.delete(CORE_CACHE);
-        throw new Error("See. v60 shell has not propagated yet");
+        throw new Error("See. v61 shell has not propagated yet");
       }
     })(),
     self.skipWaiting(),
@@ -115,7 +115,7 @@ self.addEventListener("fetch", (event) => {
       || url.href === LUT_MANIFEST_URL) {
     event.respondWith(caches.open(CORE_CACHE).then(async (cache) => (
       await cache.match(request, { ignoreSearch: false })
-      || (url.searchParams.get("v") === "59" && await (await caches.open(PREVIOUS_CORE_CACHE)).match(request))
+      || (url.searchParams.get("v") === "60" && await (await caches.open(PREVIOUS_CORE_CACHE)).match(request))
       || fetchAndCache(request, CORE_CACHE)
     )));
   }

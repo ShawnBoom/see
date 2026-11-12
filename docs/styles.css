@@ -320,7 +320,7 @@ input:focus-visible {
 
 .filter-row {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(max-content, 1fr));
   grid-template-rows: repeat(2, minmax(0, 1fr));
   flex: 0 0 68px;
   min-height: 68px;
@@ -329,10 +329,11 @@ input:focus-visible {
 }
 
 .filter-button {
+  position: relative;
   display: grid;
   place-items: center;
   min-width: 0;
-  padding: 0;
+  padding: 0 3px;
   border: 0;
   background: transparent;
   color: rgba(243, 232, 204, 0.5);
@@ -344,17 +345,23 @@ input:focus-visible {
   letter-spacing: 0.055em;
 }
 
+.filter-button::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 5px;
+  background: var(--panel);
+  pointer-events: none;
+}
+
 .filter-label {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   line-height: 1.05;
   text-align: center;
-}
-
-.filter-button:nth-child(-n + 7) {
-  border-bottom: 0.5px solid rgba(243, 232, 204, 0.08);
 }
 
 .filter-button.is-active {
@@ -372,8 +379,8 @@ input:focus-visible {
 }
 
 .adjustment-panel {
-  flex: 0 0 74px;
-  min-height: 74px;
+  flex: 0 0 80px;
+  min-height: 80px;
   padding: 2px 12px 3px;
 }
 
@@ -385,7 +392,7 @@ input:focus-visible {
 
 .adjustment-tab {
   width: 70px;
-  min-height: 26px;
+  min-height: 32px;
   padding: 0 4px;
   justify-self: center;
   border: 1px solid transparent;
@@ -397,10 +404,25 @@ input:focus-visible {
 }
 
 .adjustment-tab.is-active {
-  border-color: var(--accent);
-  background: var(--accent);
+  position: relative;
+  isolation: isolate;
   color: var(--privacy-dot);
   font-weight: 500;
+}
+
+.adjustment-tab.is-active::before {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+  z-index: -1;
+  top: 50%;
+  inset-inline: -1px;
+  height: 29px;
+  transform: translateY(-50%);
+  border: 1px solid var(--accent);
+  border-radius: inherit;
+  background: var(--accent);
+  pointer-events: none;
 }
 
 .slider-row {
@@ -423,7 +445,7 @@ input:focus-visible {
 }
 
 .range-control::-webkit-slider-runnable-track {
-  height: 3px;
+  height: 5px;
   border-radius: 99px;
   background: linear-gradient(
     to right,
@@ -435,7 +457,7 @@ input:focus-visible {
 .range-control::-webkit-slider-thumb {
   width: 15px;
   height: 15px;
-  margin-top: -6px;
+  margin-top: -5px;
   appearance: none;
   border: 0;
   border-radius: 50%;
@@ -561,8 +583,7 @@ input:focus-visible {
   .compare-button,
   .photo-count { bottom: 44px; }
   .filter-row { flex-basis: 64px; min-height: 64px; }
-  .adjustment-panel { flex-basis: 70px; min-height: 70px; padding-block: 2px 3px; }
-  .adjustment-tab { min-height: 24px; }
+  .adjustment-panel { flex-basis: 78px; min-height: 78px; padding-block: 2px 3px; }
   .bottom-actions { flex-basis: 38px; min-height: 38px; margin-bottom: 5px; }
 }
 
